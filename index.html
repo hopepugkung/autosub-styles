@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>เลือกสไตล์ซับ</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: var(--tg-theme-bg-color, #17212b);
+    --card: var(--tg-theme-secondary-bg-color, #232e3c);
+    --text: var(--tg-theme-text-color, #f5f5f5);
+    --hint: var(--tg-theme-hint-color, #8b9aa7);
+    --accent: var(--tg-theme-button-color, #2ea6ff);
+    --accent-text: var(--tg-theme-button-text-color, #ffffff);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Kanit", system-ui, sans-serif; }
+  header { padding: 16px 16px 4px; max-width: 520px; margin: 0 auto; }
+  h1 { margin: 0; font-size: 20px; font-weight: 600; }
+  header p { margin: 4px 0 0; color: var(--hint); font-size: 14px; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 12px 16px 96px; max-width: 520px; margin: 0 auto; }
+  .card { background: var(--card); border: 3px solid transparent; border-radius: 12px; overflow: hidden; min-width: 0; width: 100%;
+          padding: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; transition: transform .12s, border-color .12s; }
+  .card:active { transform: scale(.97); }
+  .card.selected { border-color: var(--accent); }
+  .card video { display: block; width: 100%; aspect-ratio: 540 / 300; object-fit: cover; background: #2b5876; pointer-events: none; }
+  .card .label { display: block; padding: 8px 12px 10px; font-size: 15px; line-height: 1.3; }
+  .num { color: var(--hint); margin-right: 3px; }
+  .random { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom));
+            border: 0; border-radius: 12px; padding: 14px; font: 600 16px "Kanit", sans-serif;
+            background: var(--accent); color: var(--accent-text); cursor: pointer; }
+  .seg { max-width: 520px; margin: 8px auto 0; padding: 0 16px; }
+  .seg-label { font-size: 13px; color: var(--hint); }
+  .seg-row { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 6px; margin-top: 6px; }
+  .seg-row button { border: 2px solid transparent; background: var(--card); color: var(--text); border-radius: 10px;
+                    padding: 8px 4px; font: 14px "Kanit", sans-serif; cursor: pointer; line-height: 1.2; }
+  .seg-row button small { display: block; font-size: 11px; color: var(--hint); }
+  .seg-row button.on { border-color: var(--accent); }
+  .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+  .toggles button { border: 2px solid transparent; background: var(--card); color: var(--text); border-radius: 10px;
+                    padding: 8px 10px; font: 14px "Kanit", sans-serif; cursor: pointer; text-align: left; line-height: 1.25; }
+  .toggles button b { font-weight: 600; }
+  .toggles button small { display: block; font-size: 11.5px; color: var(--hint); margin-top: 2px; }
+  .toggles button.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, var(--card)); }
+  .toggles button.on b::after { content: " ✓"; color: var(--accent); }
+  .tag { display: inline-block; font-size: 11px; color: var(--hint); margin-left: 4px; }
+  .debug { text-align: center; color: var(--hint); font-size: 11px; margin: -80px 0 90px; opacity: .6; }
+  .notice { margin: 12px 16px; padding: 10px 12px; border-radius: 10px; background: var(--card); color: var(--hint); font-size: 13px; display: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>เลือกสไตล์ซับ</h1>
+  <p>แตะที่ตัวอย่างเพื่อเลือกได้เลย</p>
+</header>
+<div class="seg" id="seg">
+  <span class="seg-label">ตำแหน่งซับ</span>
+  <div class="seg-row">
+    <button data-pos="auto" class="on">🤖 อัตโนมัติ<small>หลบหน้าคน</small></button>
+    <button data-pos="top">⬆️ บน</button>
+    <button data-pos="middle">⏺ กลาง</button>
+    <button data-pos="bottom">⬇️ ล่าง</button>
+  </div>
+</div>
+<div class="seg">
+  <span class="seg-label">ตัวเลือกเสริม (ใช้ได้กับทุกสไตล์)</span>
+  <div class="toggles">
+    <button data-opt="hl"><b>✨ AI เลือกคำเด่น</b><small>ขึ้นเฉพาะคำสำคัญสั้นๆ แทนทุกคำ (+30 วิ)</small></button>
+    <button data-opt="fx"><b>🎬 เอฟเฟกต์</b><small>เปิดคลิปเบลอ→ชัด ประกายวิบวับ ขีดเน้น</small></button>
+  </div>
+</div>
+<div class="notice" id="notice">เปิดหน้านี้จากปุ่มในบอท Telegram เพื่อเลือกสไตล์</div>
+<main class="grid" id="grid"></main>
+<p class="debug" id="debug"></p>
+<button class="random" id="random">🎲 สุ่มให้เลย</button>
+<script>
+  const tg = window.Telegram && window.Telegram.WebApp;
+  const ctx = new URLSearchParams(location.search).get("ctx") || "new";  // "new" | "rs:<job_id>"
+  // initData is empty when opened from a keyboard button, so detect Telegram by platform instead
+  const inTelegram = !!(tg && tg.platform && tg.platform !== "unknown");
+  if (inTelegram) { tg.ready(); tg.expand(); }
+  else document.getElementById("notice").style.display = "block";
+  document.getElementById("debug").textContent = `platform: ${tg ? tg.platform : "-"} · v${tg ? tg.version : "-"}`;
+
+  const params = new URLSearchParams(location.search);
+  const bot = params.get("bot");
+  let sent = false;
+  let pos = "auto";
+  const opts = { hl: false, fx: false };
+  let styleList = [];
+  function refreshVideos() {
+    styleList.forEach(s => {
+      const suffix = (opts.hl && !s.builtin.hl ? "h" : "") + (opts.fx && !s.builtin.fx ? "f" : "");
+      const name = s.key + (suffix ? "_" + suffix : "");
+      const v = document.getElementById("v-" + s.key);
+      if (v && !v.src.includes("/" + name + ".mp4")) {
+        v.poster = `previews/${name}.jpg?v=${s.v}`;
+        v.src = `previews/${name}.mp4?v=${s.v}`;
+        v.play().catch(() => {});
+      }
+    });
+  }
+  document.querySelectorAll(".toggles button").forEach(b => b.onclick = () => {
+    opts[b.dataset.opt] = !opts[b.dataset.opt];
+    b.classList.toggle("on", opts[b.dataset.opt]);
+    if (tg && tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+    refreshVideos();
+  });
+  document.querySelectorAll(".seg-row button").forEach(b => b.onclick = () => {
+    document.querySelectorAll(".seg-row button").forEach(x => x.classList.remove("on"));
+    b.classList.add("on");
+    pos = b.dataset.pos;
+    if (tg && tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+  });
+
+  // fallback that works on every client (incl. Telegram Web): deep link -> "/start sty_<style>_<ctx>"
+  function viaLink(key) {
+    if (!bot) return false;
+    const flags = (opts.hl ? "h" : "") + (opts.fx ? "f" : "") || "x";
+    const link = `https://t.me/${bot}?start=sty_${key}_${pos}_${flags}_${ctx.replace(":", "-")}`;
+    if (inTelegram) { tg.openTelegramLink(link); setTimeout(() => tg.close(), 300); }
+    else location.href = link;
+    return true;
+  }
+
+  function choose(key, el) {
+    if (sent) return;
+    document.querySelectorAll(".card").forEach(c => c.classList.remove("selected"));
+    if (el) el.classList.add("selected");
+    if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred("medium");
+    sent = true;
+    if (!inTelegram) { if (!viaLink(key)) sent = false; return; }
+    try { tg.sendData(JSON.stringify({ style: key, pos, hl: opts.hl, fx: opts.fx, ctx })); } catch (e) { /* fall through */ }
+    // sendData closes the app on success; still here -> client didn't take it, use the link
+    setTimeout(() => { if (!viaLink(key)) { sent = false; tg.showAlert("ส่งไม่สำเร็จ ลองกดปุ่ม 🎨 ในแชตใหม่อีกครั้ง"); } }, 1500);
+  }
+  document.getElementById("random").onclick = () => choose("random", null);
+
+  fetch("styles.json?t=" + Date.now()).then(r => r.json()).then(styles => {
+    styleList = styles;
+    const grid = document.getElementById("grid");
+    styles.forEach((s, i) => {
+      const card = document.createElement("button");
+      card.className = "card";
+      card.innerHTML =
+        `<video id="v-${s.key}" src="previews/${s.key}.mp4?v=${s.v}" poster="previews/${s.key}.jpg?v=${s.v}" autoplay muted loop playsinline></video>` +
+        `<span class="label"><span class="num">${i + 1}.</span>${s.label}` +
+        (s.builtin.hl || s.builtin.fx ? `<span class="tag">(มี${s.builtin.hl ? " AI คำเด่น" : ""}${s.builtin.fx ? " เอฟเฟกต์" : ""}ในตัว)</span>` : "") +
+        `</span>`;
+      card.onclick = () => choose(s.key, card);
+      grid.appendChild(card);
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+[
+ {
+  "key": "classic",
+  "label": "ขาวขอบดำ (คลาสสิก)",
+  "v": 1790500913,
+  "builtin": {
+   "hl": false,
+   "fx": false
+  }
+ },
+ {
+  "key": "pop",
+  "label": "💥 Popup ตัวใหญ่",
+  "v": 1790500913,
+  "builtin": {
+   "hl": false,
+   "fx": false
+  }
+ },
+ {
+  "key": "karaoke",
+  "label": "🎤 คาราโอเกะ ไล่สีทีละคำ",
+  "v": 1790500913,
+  "builtin": {
+   "hl": false,
+   "fx": false
+  }
+ },
+ {
+  "key": "tiktok",
+  "label": "🔥 TikTok ทีละคำ กลางจอ",
+  "v": 1790500913,
+  "builtin": {
+   "hl": false,
+   "fx": false
+  }
+ },
+ {
+  "key": "box",
+  "label": "📺 กล่องดำ (สไตล์ข่าว)",
+  "v": 1790500913,
+  "builtin": {
+   "hl": false,
+   "fx": false
+  }
+ },
+ {
+  "key": "colorful",
+  "label": "🌈 สีสันสลับสี",
+  "v": 1790500913,
+  "builtin": {
+   "hl": false,
+   "fx": false
+  }
+ },
+ {
+  "key": "review",
+  "label": "✨ รีวิวสินค้า (ข้อความเด่น)",
+  "v": 1790500913,
+  "builtin": {
+   "hl": true,
+   "fx": true
+  }
+ }
+]
